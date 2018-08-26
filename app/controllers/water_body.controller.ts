@@ -31,6 +31,8 @@ export class WaterBodyController {
 		let nameQueryResult: QueryResult = await DbClient.query(nameQuery, [id]);
 		let temperatureQueryResult: QueryResult = await DbClient.query(temperatureQuery, [id]);
 
+		await DbClient.query('LISTEN temperature_change_channel');
+
 		if (nameQueryResult.rowCount == 0) {
 			res.status(404).end();
 			console.error('Could not retreive name of water body');
@@ -55,5 +57,9 @@ export class WaterBodyController {
 		}
 
 		res.render('water_body', {waterBody: waterBody, temperatureData: temperatureData});
+
+		DbClient.on('notification', (message) => {
+			console.log(message);
+		});
 	}
 }

@@ -1,11 +1,14 @@
 h1 #{waterBody.name}
 
-table
-    tr
-        th Minimum Temperature
-        th Maximum Temperature
-
-    each temperatureInfo in temperatureData
+if temperatureData.length != 0
+    table
         tr
-            td #{temperatureInfo.minimumTemperature}
-            td #{temperatureInfo.maximumTemperature}
+            th Minimum Temperature
+            th Maximum Temperature
+
+        each temperatureInfo in temperatureData
+            tr
+                td #{temperatureInfo.minimumTemperature}
+                td #{temperatureInfo.maximumTemperature}
+else
+    p Data not available

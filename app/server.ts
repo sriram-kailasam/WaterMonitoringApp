@@ -1,6 +1,8 @@
 import express from 'express';
 import path from 'path';
 import {Client, ClientConfig} from 'pg';
+import socketIO = require('socket.io');
+
 require('dotenv').config();
 
 import {IndexRouter} from './routes/index.routes';
@@ -32,6 +34,10 @@ app.use('/', IndexRouter);
 app.use('/waterbody', WaterBodyRouter);
 
 const port = Number(process.env.PORT) || 8080;
-app.listen(port, () => {
-	console.log(`Server listening at port ${port}`);
-})
+
+export const Server = app.listen(port, () => {
+	console.log(`Server listening on port ${port}`);
+});
+
+let socketOptions;
+export const SocketServer = socketIO(Server);

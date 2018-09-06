@@ -1,19 +1,22 @@
-h1 #{waterBody.name}
-
 head
+    title #{waterBody.name}
+
+body
+    h1 #{waterBody.name}
+
+    if temperatureData.length != 0
+        table#temperatureDataTable
+            tr
+                th Minimum Temperature
+                th Maximum Temperature
+
+            each temperatureInfo in temperatureData
+                tr
+                    td #{temperatureInfo.minimumTemperature}
+                    td #{temperatureInfo.maximumTemperature}
+    else
+        p Data not available
+
     script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js')
     script(src='https://cdn.socket.io/socket.io-1.0.0.js')
     script(src='/scripts/update_temperature_page.js')
-
-if temperatureData.length != 0
-    table#temperatureDataTable
-        tr
-            th Minimum Temperature
-            th Maximum Temperature
-
-        each temperatureInfo in temperatureData
-            tr
-                td #{temperatureInfo.minimumTemperature}
-                td #{temperatureInfo.maximumTemperature}
-else
-    p Data not available

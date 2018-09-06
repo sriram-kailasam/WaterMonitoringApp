@@ -1,6 +1,6 @@
 import {WaterBody} from './../models/water_body.model';
 import {Request, Response} from 'express';
-import {DbClient, Server, SocketServer} from '../server';
+import {DbClient, SocketServer} from '../server';
 import {TemperatureInfo} from '../models/temperature_info.model';
 import {QueryResult} from 'pg';
 
@@ -45,10 +45,7 @@ export class WaterBodyController {
 				Number(row.minimum_temperature),
 				Number(row.id)));
 
-			SocketServer.on('connection', (socket) => {
-				socket.emit('message', 'hello from server');
-				socket.emit('temperature_changed', row);
-			});
+			SocketServer.sockets.emit('temperature_changed', row);
 		});
 
 		res.render('water_body', {waterBody: waterBody, temperatureData: temperatureData});

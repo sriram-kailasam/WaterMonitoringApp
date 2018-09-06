@@ -68,7 +68,8 @@ export class WaterBodyController {
 			+ 'temperature_data.maximum_temperature '
 			+ 'FROM water_bodies INNER JOIN temperature_data ON '
 			+ 'water_bodies.id=temperature_data.water_body_id '
-			+ 'AND temperature_data.water_body_id=$1';
+			+ 'AND temperature_data.water_body_id=$1 '
+			+ 'ORDER BY datetime DESC';
 
 		let temperatureQueryResult: QueryResult = await DbClient.query(temperatureQuery, [waterBodyId]);
 		let temperatureData: Array<TemperatureInfo> = new Array();

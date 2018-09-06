@@ -5,6 +5,6 @@
         let html = `<tr><td>${row['minimum_temperature']}</td>
                     <td>${row['maximum_temperature']}</td></tr>`;
 
-        $('#temperatureDataTable').append(html);
+        $('#temperatureDataTable tbody').prepend(html);
     });
 })();

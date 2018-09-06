@@ -1,19 +1,21 @@
 head
-    title #{waterBody.name}
+    title #{waterBody.name} - Water Monitoring App
 
 body
     h1 #{waterBody.name}
 
     if temperatureData.length != 0
         table#temperatureDataTable
-            tr
-                th Minimum Temperature
-                th Maximum Temperature
-
-            each temperatureInfo in temperatureData
+            thead
                 tr
-                    td #{temperatureInfo.minimumTemperature}
-                    td #{temperatureInfo.maximumTemperature}
+                    th Minimum Temperature
+                    th Maximum Temperature
+
+            tbody
+                each temperatureInfo in temperatureData
+                    tr
+                        td #{temperatureInfo.minimumTemperature}
+                        td #{temperatureInfo.maximumTemperature}
     else
         p Data not available
 

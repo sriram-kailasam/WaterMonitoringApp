@@ -3,6 +3,7 @@ import {Request, Response} from "express";
 import {DbClient, SocketServer} from "../server";
 import {TemperatureInfo} from "../models/temperature_info.model";
 import {QueryResult} from "pg";
+import { Socket } from "socket.io";
 
 export class WaterBodyController {
 	static async listAllWaterBodies(req: Request, res: Response) {
@@ -36,7 +37,7 @@ export class WaterBodyController {
 
 		let temperatureData = await WaterBodyController.getTemperatureData(id);
 
-		SocketServer.on('connect', () => console.log('Connected to client'));
+		SocketServer.on('connect', (socket: Socket) => console.log(`Connected to client with id: ${socket.id}`));
 		DbClient.on("notification", (message) => {
 			let row = JSON.parse(String(message.payload));
 

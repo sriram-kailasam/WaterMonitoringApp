@@ -11,4 +11,14 @@ export class TemperatureInfo {
         this.maximumTemperature = maximum_temperature;
         this.waterBodyId = waterBodyId;
     }
+
+    toString() {
+        return JSON.stringify({
+            date: this.date,
+            time: this.time,
+            minimumTemperature: this.minimumTemperature,
+            maximumTemperature: this.maximumTemperature,
+            waterBodyId: this.waterBodyId
+        });
+    }
 }

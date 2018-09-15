@@ -1,7 +1,8 @@
 import express from 'express';
 import path from 'path';
 import {Client, ClientConfig} from 'pg';
-import socketIO = require('socket.io');
+import http = require('http');
+import ws = require('ws');
 
 require('dotenv').config();
 
@@ -35,9 +36,10 @@ app.use('/waterbody', WaterBodyRouter);
 
 const port = Number(process.env.PORT) || 8080;
 
-export const Server = app.listen(port, () => {
+const server: http.Server = http.createServer(app);
+
+export const SocketServer = new ws.Server({server});
+
+server.listen(port, () => {
 	console.log(`Server listening on port ${port}`);
 });
-
-let socketOptions;
-export const SocketServer = socketIO(Server);

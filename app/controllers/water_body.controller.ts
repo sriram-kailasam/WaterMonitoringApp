@@ -3,7 +3,6 @@ import {Request, Response} from "express";
 import {DbClient, SocketServer} from "../server";
 import {TemperatureInfo} from "../models/temperature_info.model";
 import {QueryResult} from "pg";
-import { Socket } from "socket.io";
 
 export class WaterBodyController {
 	static async listAllWaterBodies(req: Request, res: Response) {
@@ -37,30 +36,34 @@ export class WaterBodyController {
 
 		let temperatureData = await WaterBodyController.getTemperatureData(id);
 
-		SocketServer.on('connect', (socket: Socket) => console.log(`Connected to client with id: ${socket.id}`));
-		DbClient.on("notification", (message) => {
-			let row = JSON.parse(String(message.payload));
-
-			// Ugly way to get date and time from the payload using regular expressions 
-			let dateRegex = new RegExp(/[0-9]{4}-[0-9]{2}-[0-9]{2}/);
-			let timeRegex = new RegExp(/[0-9]{2}:[0-9]{2}:[0-9]{2}/);
-
-			// Supppress null warnings
-			let date = dateRegex.exec(row.datetime)![0].split('-').reverse().join('-');
-			let time = timeRegex.exec(row.datetime)![0];
-
-			let temperatureInfo = new TemperatureInfo(
-				date,
-				time,
-				Number(row.minimum_temperature),
-				Number(row.maximum_temperature),
-				Number(row.water_body_id));
-			
-			SocketServer.sockets.emit("temperature_changed", temperatureInfo);
-			console.log('Data sent');
-		});
-
 		res.render("water_body", {waterBody: waterBody, temperatureData: temperatureData});
+
+		SocketServer.once('connection', (socket) => {
+			console.log('Socket client connected');
+			DbClient.on("notification", (message) => {
+				DbClient.removeAllListeners();
+				let row = JSON.parse(String(message.payload));
+
+				// Ugly way to get date and time from the payload using regular expressions 
+				let dateRegex = new RegExp(/[0-9]{4}-[0-9]{2}-[0-9]{2}/);
+				let timeRegex = new RegExp(/[0-9]{2}:[0-9]{2}:[0-9]{2}/);
+
+				// Supppress null warnings
+				let date = dateRegex.exec(row.datetime)![0].split('-').reverse().join('-');
+				let time = timeRegex.exec(row.datetime)![0];
+
+				let temperatureInfo = new TemperatureInfo(
+					date,
+					time,
+					Number(row.minimum_temperature),
+					Number(row.maximum_temperature),
+					Number(row.water_body_id));
+
+				if (socket.readyState == socket.OPEN) {
+					socket.send(temperatureInfo.toString());
+				}
+			});		
+		});
 	}
 
 	private static async getWaterBodyName(waterBodyId: number): Promise<string> {

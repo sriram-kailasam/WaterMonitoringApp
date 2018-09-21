@@ -1,6 +1,6 @@
 import {WaterBody} from "./../models/water_body.model";
 import {Request, Response} from "express";
-import {DbClient, SocketServer} from "../server";
+import {DbClient} from "../server";
 import {TemperatureInfo} from "../models/temperature_info.model";
 import {HumidityInfo} from "../models/humidity_info.model";
 import {QueryResult} from "pg";
@@ -43,40 +43,13 @@ export class WaterBodyController {
 			waterBody: waterBody, 
 			temperatureData: temperatureData
 		});
-
-		SocketServer.once('connection', (socket) => {
-			console.log('Socket client connected');
-			DbClient.on("notification", (message) => {
-				DbClient.removeAllListeners();
-				let row = JSON.parse(String(message.payload));
-
-				// Ugly way to get date and time from the payload using regular expressions 
-				let dateRegex = new RegExp(/[0-9]{4}-[0-9]{2}-[0-9]{2}/);
-				let timeRegex = new RegExp(/[0-9]{2}:[0-9]{2}:[0-9]{2}/);
-
-				// Supppress null warnings
-				let date = dateRegex.exec(row.datetime)![0].split('-').reverse().join('-');
-				let time = timeRegex.exec(row.datetime)![0];
-
-				let temperatureInfo = new TemperatureInfo(
-					date,
-					time,
-					Number(row.minimum_temperature),
-					Number(row.maximum_temperature),
-					Number(row.water_body_id));
-
-				if (socket.readyState == socket.OPEN) {
-					socket.send(temperatureInfo.toString());
-				}
-			});		
-		});
 	}
 
 	static async showWaterBodyTemperature(req: Request, res: Response) {
 		let waterBodyId = req.params.id;
 
 		let waterBodyName = await WaterBodyController.getWaterBodyName(waterBodyId);
-		let temperatureData = 
+		let temperatureData: Array<TemperatureInfo> = 
 			await TemperatureController.getTemperatureData(waterBodyId);
 
 		res.render('water_body_temperature', {

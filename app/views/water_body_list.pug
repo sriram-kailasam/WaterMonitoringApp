@@ -1,4 +1,24 @@
-each waterBody in waterBodyList
-	div
-		a(href=`/waterbody/${waterBody.id}`)
-			h3 #{waterBody.name}
+extends layout
+
+block head
+	title Water Bodies - Water Monitoring App
+
+block append styles
+	style.
+		.temperature-humidity-option {
+			float: right; 
+		}
+
+
+block content
+	ul.list-group
+		each waterBody in waterBodyList
+			li.list-group-item.water-body-item
+				a(href=`/waterbody/${waterBody.id}`)
+					b #{waterBody.name}
+
+				span.temperature-humidity-option
+					a(href=`/waterbody/${waterBody.id}/temperature`) Temperature | 
+					a(href=`/waterbody/${waterBody.id}/humidity`) Humidity
+
+					

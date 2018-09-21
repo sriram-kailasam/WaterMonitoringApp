@@ -2,7 +2,7 @@ import {WaterBody} from "./../models/water_body.model";
 import {Request, Response} from "express";
 import {DbClient, SocketServer} from "../server";
 import {TemperatureInfo} from "../models/temperature_info.model";
-import {HumidityInfo} from '../models/humidity_info.model';
+import {HumidityInfo} from "../models/humidity_info.model";
 import {QueryResult} from "pg";
 import {TemperatureController} from "./temperature.contoller";
 import {HumidityController} from "./humidity.controller";
@@ -39,7 +39,10 @@ export class WaterBodyController {
 
 		let temperatureData = await TemperatureController.getTemperatureData(id);
 
-		res.render("water_body", {waterBody: waterBody, temperatureData: temperatureData});
+		res.render("water_body", {
+			waterBody: waterBody, 
+			temperatureData: temperatureData
+		});
 
 		SocketServer.once('connection', (socket) => {
 			console.log('Socket client connected');
@@ -68,6 +71,19 @@ export class WaterBodyController {
 			});		
 		});
 	}
+
+	static async showWaterBodyTemperature(req: Request, res: Response) {
+		let waterBodyId = req.params.id;
+
+		let waterBodyName = await WaterBodyController.getWaterBodyName(waterBodyId);
+		let temperatureData = 
+			await TemperatureController.getTemperatureData(waterBodyId);
+
+		res.render('water_body_temperature', {
+			waterBodyName: waterBodyName,
+			temperatureData: temperatureData
+		});
+	}
 	
 	static async showWaterBodyHumidity(req: Request, res: Response) {
 		let waterBodyId = req.params.id;
@@ -78,7 +94,8 @@ export class WaterBodyController {
 
 		res.render('water_body_humidity', {
 			waterBodyName: waterBodyName,
-			humidityData: humidityData});
+			humidityData: humidityData
+		});
 	}
 
 	private static async getWaterBodyName(waterBodyId: number): Promise<string> {

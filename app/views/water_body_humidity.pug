@@ -1,0 +1,25 @@
+extends layout
+
+block head
+	title #{waterBodyName}
+
+block content
+	h1 #{waterBodyName}
+
+	if humidityData.length != 0
+		table.table.table-striped
+			thead
+				tr
+					th Date
+					th Time
+					th Humidity
+
+			tbody
+				each humidityInfo in humidityData
+					tr
+						td #{humidityInfo.date}
+						td #{humidityInfo.time}
+						td #{humidityInfo.humidity}
+
+	else
+		p Data not available

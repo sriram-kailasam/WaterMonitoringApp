@@ -2,7 +2,10 @@ import {WaterBody} from "./../models/water_body.model";
 import {Request, Response} from "express";
 import {DbClient, SocketServer} from "../server";
 import {TemperatureInfo} from "../models/temperature_info.model";
+import {HumidityInfo} from '../models/humidity_info.model';
 import {QueryResult} from "pg";
+import {TemperatureController} from "./temperature.contoller";
+import {HumidityController} from "./humidity.controller";
 
 export class WaterBodyController {
 	static async listAllWaterBodies(req: Request, res: Response) {
@@ -34,7 +37,7 @@ export class WaterBodyController {
 		let waterBody =
 			new WaterBody(id, name);
 
-		let temperatureData = await WaterBodyController.getTemperatureData(id);
+		let temperatureData = await TemperatureController.getTemperatureData(id);
 
 		res.render("water_body", {waterBody: waterBody, temperatureData: temperatureData});
 
@@ -65,6 +68,18 @@ export class WaterBodyController {
 			});		
 		});
 	}
+	
+	static async showWaterBodyHumidity(req: Request, res: Response) {
+		let waterBodyId = req.params.id;
+
+		let waterBodyName = await WaterBodyController.getWaterBodyName(waterBodyId);
+		let humidityData: Array<HumidityInfo> = 
+			await HumidityController.getHumidityData(waterBodyId);
+
+		res.render('water_body_humidity', {
+			waterBodyName: waterBodyName,
+			humidityData: humidityData});
+	}
 
 	private static async getWaterBodyName(waterBodyId: number): Promise<string> {
 		const nameQuery = "SELECT id, name FROM water_bodies WHERE id=$1";
@@ -75,36 +90,5 @@ export class WaterBodyController {
 		}
 
 		return Promise.resolve(nameQueryResult.rows[0].name);
-	}
-
-	private static async getTemperatureData(waterBodyId: number): Promise<Array<TemperatureInfo>> {
-		const temperatureQuery =
-			"SELECT to_char(temperature_data.datetime, 'DD-MM-YYYY') AS date, "
-			+ "to_char(temperature_data.datetime, 'HH:MI:SS') AS time, " 
-			+ "temperature_data.minimum_temperature, "
-			+ "temperature_data.maximum_temperature "
-			+ "FROM water_bodies INNER JOIN temperature_data ON "
-			+ "water_bodies.id=temperature_data.water_body_id "
-			+ "AND temperature_data.water_body_id=$1 "
-			+ "ORDER BY temperature_data.datetime DESC";
-
-		let temperatureQueryResult: QueryResult = await DbClient.query(temperatureQuery, [waterBodyId]);
-		let temperatureData: Array<TemperatureInfo> = new Array();
-
-		if (temperatureQueryResult.rowCount != 0) {
-			for (let row of temperatureQueryResult.rows) {
-				let temperatureInfo = new TemperatureInfo(
-					row.date,
-					row.time,
-					Number(row.minimum_temperature),
-					Number(row.maximum_temperature),
-					Number(row.water_body_id)
-				);
-
-				temperatureData.push(temperatureInfo);
-			}
-		}
-
-		return Promise.resolve(temperatureData);
 	}
 }

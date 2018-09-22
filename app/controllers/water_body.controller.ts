@@ -23,8 +23,6 @@ export class WaterBodyController {
 	static async showWaterBody(req: Request, res: Response) {
 		let id = req.params.id;
 
-		await DbClient.query("LISTEN temperature_change_channel");
-
 		let name: string;
 		try {
 			name = await WaterBodyController.getWaterBodyName(id);

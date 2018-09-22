@@ -1,8 +1,11 @@
 import {WaterBody} from "./../models/water_body.model";
 import {Request, Response} from "express";
-import {DbClient, SocketServer} from "../server";
+import {DbClient} from "../server";
 import {TemperatureInfo} from "../models/temperature_info.model";
+import {HumidityInfo} from "../models/humidity_info.model";
 import {QueryResult} from "pg";
+import {TemperatureController} from "./temperature.contoller";
+import {HumidityController} from "./humidity.controller";
 
 export class WaterBodyController {
 	static async listAllWaterBodies(req: Request, res: Response) {
@@ -20,8 +23,6 @@ export class WaterBodyController {
 	static async showWaterBody(req: Request, res: Response) {
 		let id = req.params.id;
 
-		await DbClient.query("LISTEN temperature_change_channel");
-
 		let name: string;
 		try {
 			name = await WaterBodyController.getWaterBodyName(id);
@@ -34,35 +35,37 @@ export class WaterBodyController {
 		let waterBody =
 			new WaterBody(id, name);
 
-		let temperatureData = await WaterBodyController.getTemperatureData(id);
+		let temperatureData = await TemperatureController.getTemperatureData(id);
 
-		res.render("water_body", {waterBody: waterBody, temperatureData: temperatureData});
+		res.render("water_body", {
+			waterBody: waterBody, 
+			temperatureData: temperatureData
+		});
+	}
 
-		SocketServer.once('connection', (socket) => {
-			console.log('Socket client connected');
-			DbClient.on("notification", (message) => {
-				DbClient.removeAllListeners();
-				let row = JSON.parse(String(message.payload));
+	static async showWaterBodyTemperature(req: Request, res: Response) {
+		let waterBodyId = req.params.id;
 
-				// Ugly way to get date and time from the payload using regular expressions 
-				let dateRegex = new RegExp(/[0-9]{4}-[0-9]{2}-[0-9]{2}/);
-				let timeRegex = new RegExp(/[0-9]{2}:[0-9]{2}:[0-9]{2}/);
+		let waterBodyName = await WaterBodyController.getWaterBodyName(waterBodyId);
+		let temperatureData: Array<TemperatureInfo> = 
+			await TemperatureController.getTemperatureData(waterBodyId);
 
-				// Supppress null warnings
-				let date = dateRegex.exec(row.datetime)![0].split('-').reverse().join('-');
-				let time = timeRegex.exec(row.datetime)![0];
+		res.render('water_body_temperature', {
+			waterBodyName: waterBodyName,
+			temperatureData: temperatureData
+		});
+	}
+	
+	static async showWaterBodyHumidity(req: Request, res: Response) {
+		let waterBodyId = req.params.id;
 
-				let temperatureInfo = new TemperatureInfo(
-					date,
-					time,
-					Number(row.minimum_temperature),
-					Number(row.maximum_temperature),
-					Number(row.water_body_id));
+		let waterBodyName = await WaterBodyController.getWaterBodyName(waterBodyId);
+		let humidityData: Array<HumidityInfo> = 
+			await HumidityController.getHumidityData(waterBodyId);
 
-				if (socket.readyState == socket.OPEN) {
-					socket.send(temperatureInfo.toString());
-				}
-			});		
+		res.render('water_body_humidity', {
+			waterBodyName: waterBodyName,
+			humidityData: humidityData
 		});
 	}
 
@@ -75,36 +78,5 @@ export class WaterBodyController {
 		}
 
 		return Promise.resolve(nameQueryResult.rows[0].name);
-	}
-
-	private static async getTemperatureData(waterBodyId: number): Promise<Array<TemperatureInfo>> {
-		const temperatureQuery =
-			"SELECT to_char(temperature_data.datetime, 'DD-MM-YYYY') AS date, "
-			+ "to_char(temperature_data.datetime, 'HH:MI:SS') AS time, " 
-			+ "temperature_data.minimum_temperature, "
-			+ "temperature_data.maximum_temperature "
-			+ "FROM water_bodies INNER JOIN temperature_data ON "
-			+ "water_bodies.id=temperature_data.water_body_id "
-			+ "AND temperature_data.water_body_id=$1 "
-			+ "ORDER BY temperature_data.datetime DESC";
-
-		let temperatureQueryResult: QueryResult = await DbClient.query(temperatureQuery, [waterBodyId]);
-		let temperatureData: Array<TemperatureInfo> = new Array();
-
-		if (temperatureQueryResult.rowCount != 0) {
-			for (let row of temperatureQueryResult.rows) {
-				let temperatureInfo = new TemperatureInfo(
-					row.date,
-					row.time,
-					Number(row.minimum_temperature),
-					Number(row.maximum_temperature),
-					Number(row.water_body_id)
-				);
-
-				temperatureData.push(temperatureInfo);
-			}
-		}
-
-		return Promise.resolve(temperatureData);
 	}
 }

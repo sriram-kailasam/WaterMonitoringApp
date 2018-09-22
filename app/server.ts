@@ -2,12 +2,13 @@ import express from 'express';
 import path from 'path';
 import {Client, ClientConfig} from 'pg';
 import http = require('http');
-import ws = require('ws');
+import socketIO = require('socket.io');
 
 require('dotenv').config();
 
 import {IndexRouter} from './routes/index.routes';
 import {WaterBodyRouter} from './routes/water_body.routes';
+import {SocketEventDispactcher} from './socket_event_dispatcher';
 
 const app: express.Application = express();
 
@@ -38,7 +39,10 @@ const port = Number(process.env.PORT) || 8080;
 
 const server: http.Server = http.createServer(app);
 
-export const SocketServer = new ws.Server({server});
+const socketServer = socketIO(server);
+
+let eventDispatcher = new SocketEventDispactcher();
+eventDispatcher.registerHandlers(socketServer);
 
 server.listen(port, () => {
 	console.log(`Server listening on port ${port}`);

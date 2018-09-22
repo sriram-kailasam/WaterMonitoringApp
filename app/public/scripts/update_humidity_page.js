@@ -4,13 +4,12 @@
 		upgrade: true
 	});
 
-	socket.on('temperature_changed', function(message) {
+	socket.on('humidity_changed', function(message) {
 		let row = JSON.parse(message);
 		let html = `<tr><td>${row['date']}</td>`
 					+ `<td>${row['time']}</td>`
-					+ `<td>${row['minimumTemperature']}</td>`
-					+ `<td>${row['maximumTemperature']}</td></tr>`;
+					+ `<td>${row['humidity']}</td></tr>`;
 
-		$('#temperatureDataTable tbody').prepend(html);
+		$('#humidityDataTable tbody').prepend(html);
 	});
 })();

@@ -5,7 +5,11 @@ import {HumidityInfo} from './models/humidity_info.model';
 
 export class SocketEventDispactcher {
 	async registerHandlers(server: Server) {
-		await DbClient.query("LISTEN temperature_change_channel");
+		const listenQuery = 
+			"LISTEN temperature_change_channel;"
+			+ "LISTEN humidity_change_channel";
+		
+		await DbClient.query(listenQuery);
 		
 		server.on('connection', (socket) => {
 			console.log('Socket client connected');
@@ -50,7 +54,7 @@ export class SocketEventDispactcher {
 		let humidityInfo = new HumidityInfo(
 			date,
 			time,
-			Number(row.humdity),
+			Number(row.humidity),
 			Number(row.water_body_id)
 		);
 

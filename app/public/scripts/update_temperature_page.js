@@ -1,22 +1,26 @@
 (function () {
-	const socket = new WebSocket('ws://localhost:8000');
+	const socket = io({
+		transports: ['websocket', 'polling'],
+		upgrade: true
+	});
 
-	socket.onopen = function() {
-		console.log('Connected to server')
-	}
-	socket.onmessage = function(message) {
-		console.log(message.data);
+	socket.on('connection', function() {
+		console.log('Connected to server');
+	});
 
-		let row = JSON.parse(message.data);
+	socket.on('temperature_changed', function(message) {
+		console.log(message);
+
+		let row = JSON.parse(message);
 		let html = `<tr><td>${row['date']}</td>`
 					+ `<td>${row['time']}</td>`
 					+ `<td>${row['minimumTemperature']}</td>`
 					+ `<td>${row['maximumTemperature']}</td></tr>`;
 
 		$('#temperatureDataTable tbody').prepend(html);
-	}
+	});
 
-	socket.onclose = function() {
+	socket.on('disconnect', function() {
 		console.log('Socket disconnected');
-	}
+	});
 })();

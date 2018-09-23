@@ -5,12 +5,13 @@ import {HumidityInfo} from './models/humidity_info.model';
 
 export class SocketEventDispactcher {
 	async registerHandlers(server: Server) {
-		const listenQuery = 
+		const listenQuery =
 			"LISTEN temperature_change_channel;"
-			+ "LISTEN humidity_change_channel";
-		
+			+ "LISTEN humidity_change_channel;"
+			+ "LISTEN temperature_humidity_change_channel";
+
 		await DbClient.query(listenQuery);
-		
+
 		server.on('connection', (socket) => {
 			console.log('Socket client connected');
 			DbClient.on('notification', (message) => {
@@ -21,6 +22,11 @@ export class SocketEventDispactcher {
 					}
 					case 'humidity_change_channel': {
 						this.dispatchHumidityChangeEvent(socket, message.payload);
+						break;
+					}
+					case 'temperature_humidity_change_channel': {
+						console.log(`Data sent: ${message.payload}`);
+						this.dispatchTemperatureHumidityChangeEvent(socket, message.payload);
 						break;
 					}
 				}
@@ -41,7 +47,7 @@ export class SocketEventDispactcher {
 			Number(row.maximum_temperature),
 			Number(row.water_body_id)
 		);
-		
+
 		socket.emit('temperature_changed', temperatureInfo.toString());
 	}
 
@@ -50,7 +56,7 @@ export class SocketEventDispactcher {
 
 		let date: string = this.getDateFromPayload(row);
 		let time: string = this.getTimeFromPayload(row);
-		
+
 		let humidityInfo = new HumidityInfo(
 			date,
 			time,
@@ -59,6 +65,10 @@ export class SocketEventDispactcher {
 		);
 
 		socket.emit('humidity_changed', humidityInfo.toString());
+	}
+
+	private dispatchTemperatureHumidityChangeEvent(socket: Socket, data: any) {
+		socket.emit('temperature_humidity_changed', data);
 	}
 
 	private getDateFromPayload(payload: any): string {

@@ -7,7 +7,7 @@ block content
 	h1 #{waterBody.name}
 
 	if temperatureData.length != 0
-		table#temperatureDataTable.table.table-striped
+		table#temperatureHumidityDataTable.table.table-striped
 			thead
 				tr
 					th Date
@@ -34,4 +34,5 @@ block content
 		p Data not available
 
 block append scripts
-	script(src='/scripts/update_temperature_page.js')
+	script(src='/socket.io/socket.io.js')
+	script(src='/scripts/update_temperature_humidity.js')

@@ -1,4 +1,4 @@
-import {Server, Socket} from 'socket.io';
+import {Server} from 'socket.io';
 import {DbClient} from './server';
 import {TemperatureInfo} from './models/temperature_info.model';
 import {HumidityInfo} from './models/humidity_info.model';
@@ -12,29 +12,30 @@ export class SocketEventDispactcher {
 
 		await DbClient.query(listenQuery);
 
-		server.on('connection', (socket) => {
+		server.on('connection', () => {
 			console.log('Socket client connected');
-			DbClient.on('notification', (message) => {
-				switch (message.channel) {
-					case 'temperature_change_channel': {
-						this.dispatchTemperatureChangeEvent(socket, message.payload);
-						break;
-					}
-					case 'humidity_change_channel': {
-						this.dispatchHumidityChangeEvent(socket, message.payload);
-						break;
-					}
-					case 'temperature_humidity_change_channel': {
-						console.log(`Data sent: ${message.payload}`);
-						this.dispatchTemperatureHumidityChangeEvent(socket, message.payload);
-						break;
-					}
+		});
+
+		DbClient.on('notification', (message) => {
+			switch (message.channel) {
+				case 'temperature_change_channel': {
+					this.dispatchTemperatureChangeEvent(server, message.payload);
+					break;
 				}
-			});
+				case 'humidity_change_channel': {
+					this.dispatchHumidityChangeEvent(server, message.payload);
+					break;
+				}
+				case 'temperature_humidity_change_channel': {
+					console.log(`Data sent: ${message.payload}`);
+					this.dispatchTemperatureHumidityChangeEvent(server, message.payload);
+					break;
+				}
+			}
 		});
 	}
 
-	private dispatchTemperatureChangeEvent(socket: Socket, data: any) {
+	private dispatchTemperatureChangeEvent(server: Server, data: any) {
 		let row = JSON.parse(String(data));
 
 		let date: string = this.getDateFromPayload(row);
@@ -48,10 +49,10 @@ export class SocketEventDispactcher {
 			Number(row.water_body_id)
 		);
 
-		socket.emit('temperature_changed', temperatureInfo.toString());
+		server.sockets.emit('temperature_changed', temperatureInfo.toString());
 	}
 
-	private dispatchHumidityChangeEvent(socket: Socket, data: any) {
+	private dispatchHumidityChangeEvent(server: Server, data: any) {
 		let row = JSON.parse(String(data));
 
 		let date: string = this.getDateFromPayload(row);
@@ -64,11 +65,11 @@ export class SocketEventDispactcher {
 			Number(row.water_body_id)
 		);
 
-		socket.emit('humidity_changed', humidityInfo.toString());
+		server.sockets.emit('humidity_changed', humidityInfo.toString());
 	}
 
-	private dispatchTemperatureHumidityChangeEvent(socket: Socket, data: any) {
-		socket.emit('temperature_humidity_changed', data);
+	private dispatchTemperatureHumidityChangeEvent(server: Server, data: any) {
+		server.sockets.emit('temperature_humidity_changed', data);
 	}
 
 	private getDateFromPayload(payload: any): string {

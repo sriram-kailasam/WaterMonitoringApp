@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import {Client, ClientConfig} from 'pg';
 import http = require('http');
@@ -34,6 +34,18 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use('/', IndexRouter);
 app.use('/waterbody', WaterBodyRouter);
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+	res.status(404);
+	next();
+});
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+	if (res.statusCode === 404) {
+		res.render('404');
+		res.end();
+	}
+});
 
 const port = Number(process.env.PORT) || 8080;
 

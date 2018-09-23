@@ -1,5 +1,5 @@
 import {WaterBody} from "./../models/water_body.model";
-import {Request, Response} from "express";
+import {Request, Response, NextFunction} from "express";
 import {DbClient} from "../server";
 import {TemperatureInfo} from "../models/temperature_info.model";
 import {HumidityInfo} from "../models/humidity_info.model";
@@ -20,7 +20,7 @@ export class WaterBodyController {
 		res.render("water_body_list", {waterBodyList: waterBodyList});
 	}
 
-	static async showWaterBody(req: Request, res: Response) {
+	static async showWaterBody(req: Request, res: Response, next: NextFunction) {
 		let id = req.params.id;
 
 		let name: string;
@@ -28,7 +28,8 @@ export class WaterBodyController {
 			name = await WaterBodyController.getWaterBodyName(id);
 		} catch (error) {
 			console.error(error);
-			res.status(404).end();
+			res.status(404);
+			next();
 			return;
 		};
 

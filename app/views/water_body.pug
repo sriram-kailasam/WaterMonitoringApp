@@ -20,14 +20,16 @@ block content
 						| Maximum 
 						br
 						| Temperature
+					th Humidity
 
 			tbody
-				each temperatureInfo in temperatureData
-					tr
-						td #{temperatureInfo.date}
-						td #{temperatureInfo.time}
-						td #{temperatureInfo.minimumTemperature}
-						td #{temperatureInfo.maximumTemperature}
+				- for (let i = 0; i < temperatureData.length; i++)
+						tr
+							td #{temperatureData[i].date}
+							td #{temperatureData[i].time}
+							td #{temperatureData[i].minimumTemperature}
+							td #{temperatureData[i].maximumTemperature}
+							td #{humidityData[i].humidity}
 	else
 		p Data not available
 

@@ -2,5 +2,4 @@ node_modules/
 dist/
 .vscode/
 .env
-database.json
 npm-debug.log

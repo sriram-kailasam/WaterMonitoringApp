@@ -9,13 +9,7 @@ import {HumidityController} from "./humidity.controller";
 
 export class WaterBodyController {
 	static async listAllWaterBodies(req: Request, res: Response) {
-		const query = "SELECT id, name FROM water_bodies";
-		let waterBodyList: Array<WaterBody> = new Array();
-
-		let queryResult = await DbClient.query(query);
-		for (let row of queryResult.rows) {
-			waterBodyList.push(new WaterBody(Number(row.id), row.name));
-		}
+		let waterBodyList = await WaterBodyController.getAllWaterBodies();
 
 		res.render("water_body_list", {waterBodyList: waterBodyList});
 	}
@@ -27,8 +21,6 @@ export class WaterBodyController {
 		try {
 			name = await WaterBodyController.getWaterBodyName(id);
 		} catch (error) {
-			console.error(error);
-			res.status(404);
 			next();
 			return;
 		};
@@ -72,6 +64,54 @@ export class WaterBodyController {
 		});
 	}
 
+	static async getWaterBodyJSON(req: Request, res: Response) {
+		let waterBodyId: number = Number(req.params.id);
+		let waterBody;
+		try {
+			waterBody = await WaterBodyController.getWaterBody(waterBodyId);
+		} catch (error) {
+			console.error(error);
+			res.json({
+				message: `Water body with id ${waterBodyId} not found`
+			});
+
+			return;
+		}
+
+		res.json(waterBody);
+	}
+
+	private static async getWaterBody(waterBodyId: number) {
+		const query = 
+			`SELECT
+			to_char(temperature_data.datetime, 'DD-MM-YYYY') AS date,
+			to_char(temperature_data.datetime, 'HH:MI:SS') AS time, 
+			temperature_data.minimum_temperature,
+			temperature_data.maximum_temperature,
+			humidity_data.humidity
+			FROM water_bodies 
+			INNER JOIN temperature_data ON water_bodies.id=temperature_data.water_body_id
+			INNER JOIN humidity_data ON water_bodies.id=humidity_data.water_body_id
+			AND temperature_data.datetime=humidity_data.datetime
+			AND temperature_data.water_body_id=$1
+			AND humidity_data.water_body_id=$1
+			ORDER BY temperature_data.datetime DESC`;
+
+		let queryResult: QueryResult = await DbClient.query(query, [waterBodyId]);
+
+		let name = await WaterBodyController.getWaterBodyName(waterBodyId);
+		let arr = [];
+
+		for (let row of queryResult.rows) {
+			arr.push(row);
+		}
+
+		return {
+			name: name,
+			data: arr
+		}
+	}
+
 	private static async getWaterBodyName(waterBodyId: number): Promise<string> {
 		const nameQuery = "SELECT id, name FROM water_bodies WHERE id=$1";
 		let nameQueryResult: QueryResult = await DbClient.query(nameQuery, [waterBodyId]);
@@ -81,5 +121,17 @@ export class WaterBodyController {
 		}
 
 		return Promise.resolve(nameQueryResult.rows[0].name);
+	}
+
+	private static async getAllWaterBodies(): Promise<Array<WaterBody>> {
+		const query = "SELECT id, name FROM water_bodies";
+		let waterBodyList: Array<WaterBody> = new Array();
+
+		let queryResult = await DbClient.query(query);
+		for (let row of queryResult.rows) {
+			waterBodyList.push(new WaterBody(Number(row.id), row.name));
+		}
+
+		return waterBodyList;
 	}
 }

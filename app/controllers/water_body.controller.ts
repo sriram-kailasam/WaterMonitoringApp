@@ -32,6 +32,7 @@ export class WaterBodyController {
 		let humidityData = await HumidityController.getHumidityData(id);
 
 		res.render("water_body", {
+			waterBodyId: id,
 			waterBody: waterBody, 
 			temperatureData: temperatureData,
 			humidityData: humidityData

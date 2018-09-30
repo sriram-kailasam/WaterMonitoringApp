@@ -46,7 +46,7 @@ block content
 							return response.json();
 						})
 						.then(function(json) {
-							for (temperatureInfo of json.data) {
+							for (temperatureInfo of json.data.reverse()) {
 								timeLabels.push(temperatureInfo.time);
 								dataPoints.push(parseFloat(temperatureInfo.temperature));
 							}
@@ -62,6 +62,12 @@ block content
 										backgroundColor: '#7FFF00',
 										data: dataPoints
 									}]
+								},
+								options: {
+									title: {
+										display: true,
+										text: 'Variation of temperature with time'
+									}
 								}
 							});
 						});

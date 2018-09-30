@@ -61,6 +61,7 @@ export class WaterBodyController {
 			await HumidityController.getHumidityData(waterBodyId);
 
 		res.render('water_body_humidity', {
+			waterBodyId: waterBodyId,
 			waterBodyName: waterBodyName,
 			humidityData: humidityData
 		});

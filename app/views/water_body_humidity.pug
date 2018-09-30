@@ -4,25 +4,74 @@ block head
 	title #{waterBodyName}
 
 block content
-	h1 #{waterBodyName}
+	.container
+		ul.nav.nav-tabs
+			li.nav-item
+				a.nav-link.active(data-toggle="tab" href="#table-tab") Table
+			li.nav-item
+				a.nav-link(data-toggle="tab" href="#graph-tab") Graph
+		
+		.tab-content
+			.tab-pane.in.active#table-tab
+				h1 #{waterBodyName}
 
-	if humidityData.length != 0
-		table.table.table-striped#humidityDataTable
-			thead
-				tr
-					th Date
-					th Time
-					th Humidity
+				if humidityData.length != 0
+					table#humidityDataTable.table.table-striped
+						thead
+							tr
+								th Date
+								th Time
+								th Humidity
 
-			tbody
-				each humidityInfo in humidityData
-					tr
-						td #{humidityInfo.date}
-						td #{humidityInfo.time}
-						td #{humidityInfo.humidity}
+						tbody
+							each humidityInfo in humidityData
+								tr
+									td #{humidityInfo.date}
+									td #{humidityInfo.time}
+									td #{humidityInfo.humidity}
+				else
+					p Data not available
 
-	else
-		p Data not available
+			.tab-pane.fade.in#graph-tab
+				canvas#humidity-chart(width="undefined" height="undefined")
+
+				script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js")
+				script.
+					let ctx = document.getElementById('humidity-chart').getContext('2d');
+
+					let dataPoints = [];
+					let timeLabels = [];
+
+					fetch(`/api/waterbodies/#{waterBodyId}/humidity`)
+						.then(function(response) {
+							return response.json();
+						})
+						.then(function(json) {
+							for (humidityInfo of json.data.reverse()) {
+								timeLabels.push(humidityInfo.time);
+								dataPoints.push(parseFloat(humidityInfo.humidity));
+							}
+
+							let chart = new Chart(ctx, {
+								type: 'line',
+								data: {
+									labels: timeLabels,
+									datasets: [{
+										label: "Humidity",
+										fill: false,
+										borderColor: '#FF7F50',
+										backgroundColor: '#FF7F50',
+										data: dataPoints
+									}]
+								},
+								options: {
+									title: {
+										display: true,
+										text: 'Variation of humidity with time'
+									}
+								}
+							});
+						});
 
 block append scripts
 	script(src="/socket.io/socket.io.js")

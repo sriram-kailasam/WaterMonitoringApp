@@ -4,32 +4,44 @@ block head
 	title #{waterBodyName} - Water Monitoring App
 
 block content
-	h1 #{waterBodyName}
+	.container
+		ul.nav.nav-tabs
+			li.nav-item
+				a.nav-link.active(data-toggle="tab" href="#table-tab") Table
+			li.nav-item
+				a.nav-link(data-toggle="tab" href="#graph-tab") Graph
+		
+		.tab-content
+			.tab-pane.in.active#table-tab
+				h1 #{waterBodyName}
 
-	if temperatureData.length != 0
-		table#temperatureDataTable.table.table-striped
-			thead
-				tr
-					th Date
-					th Time
-					th
-						| Minimum 
-						br
-						| Temperature
-					th 
-						| Maximum 
-						br
-						| Temperature
+				if temperatureData.length != 0
+					table#temperatureDataTable.table.table-striped
+						thead
+							tr
+								th Date
+								th Time
+								th
+									| Minimum 
+									br
+									| Temperature
+								th 
+									| Maximum 
+									br
+									| Temperature
 
-			tbody
-				each temperatureInfo in temperatureData
-					tr
-						td #{temperatureInfo.date}
-						td #{temperatureInfo.time}
-						td #{temperatureInfo.minimumTemperature}
-						td #{temperatureInfo.maximumTemperature}
-	else
-		p Data not available
+						tbody
+							each temperatureInfo in temperatureData
+								tr
+									td #{temperatureInfo.date}
+									td #{temperatureInfo.time}
+									td #{temperatureInfo.minimumTemperature}
+									td #{temperatureInfo.maximumTemperature}
+				else
+					p Data not available
+
+			.tab-pane.fade.in#graph-tab
+				canvas#graph-canvas
 
 block append scripts
 	script(src='/socket.io/socket.io.js')

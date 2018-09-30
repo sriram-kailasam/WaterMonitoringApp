@@ -17,8 +17,7 @@ exports.setup = function(options, seedLink) {
 exports.up = function(db) {
   return db.createTable('temperature_data', {
     datetime: 'timestamp',
-    minimum_temperature: 'decimal',
-    maximum_temperature: 'decimal',
+    temperature: 'decimal',
     water_body_id: {
       type: 'int',
       notNull: true,

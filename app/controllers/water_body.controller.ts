@@ -94,6 +94,18 @@ export class WaterBodyController {
 		});
 	}
 
+	static async getWaterBodyHumidityJSON(req: Request, res: Response) {
+		let waterBodyId = Number(req.params.id);
+
+		let waterBodyName = await WaterBodyController.getWaterBodyName(waterBodyId);
+		let humidityData = await HumidityController.getHumidityData(waterBodyId);
+
+		res.json({
+			name: waterBodyName,
+			data: humidityData
+		});
+	}
+
 	private static async getWaterBody(waterBodyId: number) {
 		const query = 
 			`SELECT

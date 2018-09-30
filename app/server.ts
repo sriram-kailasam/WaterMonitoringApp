@@ -8,6 +8,7 @@ require('dotenv').config();
 
 import {IndexRouter} from './routes/index.routes';
 import {WaterBodyRouter} from './routes/water_body.routes';
+import {ApiRouter} from './routes/api.router';
 import {SocketEventDispactcher} from './socket_event_dispatcher';
 
 const app: express.Application = express();
@@ -33,7 +34,8 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use('/', IndexRouter);
-app.use('/waterbody', WaterBodyRouter);
+app.use('/api', ApiRouter);
+app.use('/waterbodies', WaterBodyRouter);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
 	res.status(404);

@@ -12,10 +12,6 @@ export class SocketEventDispactcher {
 
 		await DbClient.query(listenQuery);
 
-		server.on('connection', () => {
-			console.log('Socket client connected');
-		});
-
 		DbClient.on('notification', (message) => {
 			switch (message.channel) {
 				case 'temperature_change_channel': {
@@ -27,7 +23,6 @@ export class SocketEventDispactcher {
 					break;
 				}
 				case 'temperature_humidity_change_channel': {
-					console.log(`Data sent: ${message.payload}`);
 					this.dispatchTemperatureHumidityChangeEvent(server, message.payload);
 					break;
 				}
@@ -44,8 +39,7 @@ export class SocketEventDispactcher {
 		let temperatureInfo = new TemperatureInfo(
 			date,
 			time,
-			Number(row.minimum_temperature),
-			Number(row.maximum_temperature),
+			Number(row.temperature),
 			Number(row.water_body_id)
 		);
 

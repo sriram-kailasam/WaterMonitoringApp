@@ -46,6 +46,7 @@ export class WaterBodyController {
 			await TemperatureController.getTemperatureData(waterBodyId);
 
 		res.render('water_body_temperature', {
+			waterBodyId: waterBodyId,
 			waterBodyName: waterBodyName,
 			temperatureData: temperatureData
 		});
@@ -79,6 +80,18 @@ export class WaterBodyController {
 		}
 
 		res.json(waterBody);
+	}
+
+	static async getWaterBodyTemperatureJSON(req: Request, res: Response) {
+		let waterBodyId = Number(req.params.id);
+
+		let waterBodyName = await WaterBodyController.getWaterBodyName(waterBodyId);
+		let temperatureData = await TemperatureController.getTemperatureData(waterBodyId);
+
+		res.json({
+			name: waterBodyName,
+			data: temperatureData
+		});
 	}
 
 	private static async getWaterBody(waterBodyId: number) {

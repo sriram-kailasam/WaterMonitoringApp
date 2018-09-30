@@ -86,8 +86,7 @@ export class WaterBodyController {
 			`SELECT
 			to_char(temperature_data.datetime, 'DD-MM-YYYY') AS date,
 			to_char(temperature_data.datetime, 'HH:MI:SS') AS time, 
-			temperature_data.minimum_temperature,
-			temperature_data.maximum_temperature,
+			temperature_data.temperature,
 			humidity_data.humidity
 			FROM water_bodies 
 			INNER JOIN temperature_data ON water_bodies.id=temperature_data.water_body_id

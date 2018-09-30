@@ -5,14 +5,13 @@ import {DbClient} from '../server';
 export class TemperatureController {
 	static async getTemperatureData(waterBodyId: number): Promise<Array<TemperatureInfo>> {
 		const temperatureQuery =
-			"SELECT to_char(temperature_data.datetime, 'DD-MM-YYYY') AS date, "
-			+ "to_char(temperature_data.datetime, 'HH:MI:SS') AS time, " 
-			+ "temperature_data.minimum_temperature, "
-			+ "temperature_data.maximum_temperature "
-			+ "FROM water_bodies INNER JOIN temperature_data ON "
-			+ "water_bodies.id=temperature_data.water_body_id "
-			+ "AND temperature_data.water_body_id=$1 "
-			+ "ORDER BY temperature_data.datetime DESC";
+			`SELECT to_char(temperature_data.datetime, 'DD-MM-YYYY') AS date,
+			to_char(temperature_data.datetime, 'HH:MI:SS') AS time,
+			temperature_data.temperature
+			FROM water_bodies INNER JOIN temperature_data ON
+			water_bodies.id=temperature_data.water_body_id
+			AND temperature_data.water_body_id=$1
+			ORDER BY temperature_data.datetime DESC`;
 
 		let temperatureQueryResult: QueryResult = await DbClient.query(temperatureQuery, [waterBodyId]);
 		let temperatureData: Array<TemperatureInfo> = new Array();
@@ -22,8 +21,7 @@ export class TemperatureController {
 				let temperatureInfo = new TemperatureInfo(
 					row.date,
 					row.time,
-					Number(row.minimum_temperature),
-					Number(row.maximum_temperature),
+					Number(row.temperature),
 					Number(row.water_body_id)
 				);
 

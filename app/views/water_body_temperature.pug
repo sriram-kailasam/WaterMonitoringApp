@@ -21,22 +21,14 @@ block content
 							tr
 								th Date
 								th Time
-								th
-									| Minimum 
-									br
-									| Temperature
-								th 
-									| Maximum 
-									br
-									| Temperature
+								th Temperature
 
 						tbody
 							each temperatureInfo in temperatureData
 								tr
 									td #{temperatureInfo.date}
 									td #{temperatureInfo.time}
-									td #{temperatureInfo.minimumTemperature}
-									td #{temperatureInfo.maximumTemperature}
+									td #{temperatureInfo.temperature}
 				else
 					p Data not available
 

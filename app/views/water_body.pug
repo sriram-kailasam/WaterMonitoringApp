@@ -12,14 +12,7 @@ block content
 				tr
 					th Date
 					th Time
-					th
-						| Minimum 
-						br
-						| Temperature
-					th 
-						| Maximum 
-						br
-						| Temperature
+					th Temperature
 					th Humidity
 
 			tbody
@@ -27,8 +20,7 @@ block content
 						tr
 							td #{temperatureData[i].date}
 							td #{temperatureData[i].time}
-							td #{temperatureData[i].minimumTemperature}
-							td #{temperatureData[i].maximumTemperature}
+							td #{temperatureData[i].temperature}
 							td #{humidityData[i].humidity}
 	else
 		p Data not available

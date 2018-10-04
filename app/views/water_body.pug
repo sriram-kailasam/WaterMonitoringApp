@@ -35,54 +35,31 @@ block content
 					p Data not available
 
 			.tab-pane.fade.in#graph-tab
-				canvas#temperature-humidity-chart(width="undefined" height="undefined")
-
-				script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js")
-				script.
-					let ctx = document.getElementById('temperature-humidity-chart').getContext('2d');
-
-					let temperatureDataPoints = [];
-					let humidityDataPoints = [];
-					let timeLabels = [];
-
-					fetch(`/api/waterbodies/#{waterBodyId}`)
-						.then(function(response) {
-							return response.json();
-						})
-						.then(function(json) {
-							for (info of json.data.reverse()) {
-								timeLabels.push(info.time);
-								temperatureDataPoints.push(parseFloat(info.temperature));
-								humidityDataPoints.push(parseFloat(info.humidity));
-							}
-
-							let chart = new Chart(ctx, {
-								type: 'line',
-								data: {
-									labels: timeLabels,
-									datasets: [{
-										label: 'Temperature',
-										fill: false,
-										borderColor: '#7FFF00',
-										backgroundColor: '#7FFF00',
-										data: temperatureDataPoints
-									}, {
-										label: 'Humidity',
-										fill: false,
-										borderColor: '#FF7F50',
-										backgroundColor: '#FF7F50',
-										data: humidityDataPoints
-									}]
-								},
-								options: {
-									title: {
-										display: true,
-										text: 'Variation of temperature and humidity with time'
-									}
-								}
-							});
-						});
+				canvas#temperature-chart(width="undefined" height="undefined")
+				canvas#humidity-chart(width="undefined" height="undefined")
 
 block append scripts
+	script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js")
+	script(src="/scripts/draw_chart.js")
+	script.
+		let labels = [];
+		let temperatureDataset = [];
+		let humidityDataset = [];
+
+		let temperatureData = !{JSON.stringify(temperatureData)}
+		let humidityData = !{JSON.stringify(humidityData)}
+
+		temperatureData.reverse().forEach((info) => {
+			labels.push(info.time);
+			temperatureDataset.push(info.temperature);
+		});
+
+		humidityData.reverse().forEach((info) => {
+			humidityDataset.push(info.humidity);
+		});
+
+		drawTemperatureChart(document.getElementById('temperature-chart'), labels, temperatureDataset);
+		drawHumidityChart(document.getElementById('humidity-chart'), labels, humidityDataset);
+
 	script(src='/socket.io/socket.io.js')
 	script(src='/scripts/update_temperature_humidity.js')

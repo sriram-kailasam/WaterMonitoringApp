@@ -35,44 +35,17 @@ block content
 			.tab-pane.fade.in#graph-tab
 				canvas#humidity-chart(width="undefined" height="undefined")
 
-				script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js")
-				script.
-					let ctx = document.getElementById('humidity-chart').getContext('2d');
-
-					let dataPoints = [];
-					let timeLabels = [];
-
-					fetch(`/api/waterbodies/#{waterBodyId}/humidity`)
-						.then(function(response) {
-							return response.json();
-						})
-						.then(function(json) {
-							for (humidityInfo of json.data.reverse()) {
-								timeLabels.push(humidityInfo.time);
-								dataPoints.push(parseFloat(humidityInfo.humidity));
-							}
-
-							let chart = new Chart(ctx, {
-								type: 'line',
-								data: {
-									labels: timeLabels,
-									datasets: [{
-										label: "Humidity",
-										fill: false,
-										borderColor: '#FF7F50',
-										backgroundColor: '#FF7F50',
-										data: dataPoints
-									}]
-								},
-								options: {
-									title: {
-										display: true,
-										text: 'Variation of humidity with time'
-									}
-								}
-							});
-						});
-
 block append scripts
+	script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js")
+	script.
+		let labels = [];
+		let dataset = [];
+		let humidityData = !{JSON.stringify(humidityData)}
+		humidityData.reverse().forEach((info) => {
+			labels.push(info.time);
+			dataset.push(info.humidity);
+		});
+		drawHumidityChart(document.getElementById('humidity-chart'), labels, dataset);
+
 	script(src="/socket.io/socket.io.js")
 	script(src="/scripts/update_humidity_page.js")

@@ -35,43 +35,18 @@ block content
 			.tab-pane.fade.in#graph-tab
 				canvas#temperature-chart(width="undefined" height="undefined")
 
-				script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js")
-				script.
-					let ctx = document.getElementById('temperature-chart').getContext('2d');
-
-					let dataPoints = [];
-					let timeLabels = [];
-					fetch(`/api/waterbodies/#{waterBodyId}/temperature`)
-						.then(function(response) {
-							return response.json();
-						})
-						.then(function(json) {
-							for (temperatureInfo of json.data.reverse()) {
-								timeLabels.push(temperatureInfo.time);
-								dataPoints.push(parseFloat(temperatureInfo.temperature));
-							}
-
-							let chart = new Chart(ctx, {
-								type: 'line',
-								data: {
-									labels: timeLabels,
-									datasets: [{
-										label: "Temperature",
-										fill: false,
-										borderColor: '#7FFF00',
-										backgroundColor: '#7FFF00',
-										data: dataPoints
-									}]
-								},
-								options: {
-									title: {
-										display: true,
-										text: 'Variation of temperature with time'
-									}
-								}
-							});
-						});
-
 block append scripts
+	script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js")
+	script(src="/scripts/draw_chart.js")
+	script.
+		let labels = [];
+		let dataset = [];
+		let temperatureData = !{JSON.stringify(temperatureData)}
+		temperatureData.reverse().forEach((info) => {
+			labels.push(info.time);
+			dataset.push(info.temperature);
+		});
+		drawTemperatureChart(document.getElementById('temperature-chart'), labels, dataset);
+
 	script(src='/socket.io/socket.io.js')
 	script(src='/scripts/update_temperature_page.js')

@@ -14,11 +14,11 @@ block content
 	ul.list-group
 		each waterBody in waterBodyList
 			li.list-group-item.water-body-item
-				a(href=`/waterbody/${waterBody.id}`)
+				a(href=`/waterbodies/${waterBody.id}`)
 					b #{waterBody.name}
 
 				span.temperature-humidity-option
-					a(href=`/waterbody/${waterBody.id}/temperature`) Temperature | 
-					a(href=`/waterbody/${waterBody.id}/humidity`) Humidity
+					a(href=`/waterbodies/${waterBody.id}/temperature`) Temperature | 
+					a(href=`/waterbodies/${waterBody.id}/humidity`) Humidity
 
 					

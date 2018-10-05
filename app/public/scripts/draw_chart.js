@@ -1,7 +1,10 @@
+var TemperatureChart;
+var HumidityChart;
+
 function drawTemperatureChart(canvas, labels, dataset) {
 	let ctx = canvas.getContext('2d');
 
-	var TemperatureChart = new Chart(ctx, {
+	TemperatureChart = new Chart(ctx, {
 		type: 'line',
 		data: {
 			labels: labels,
@@ -25,7 +28,7 @@ function drawTemperatureChart(canvas, labels, dataset) {
 function drawHumidityChart(canvas, labels, dataset) {
 	let ctx = canvas.getContext('2d');
 
-	var HumidityChart = new Chart(ctx, {
+	HumidityChart = new Chart(ctx, {
 		type: 'line',
 		data: {
 			labels: labels,

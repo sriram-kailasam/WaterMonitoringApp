@@ -11,5 +11,10 @@
 					+ `<td>${row['humidity']}</td></tr>`;
 
 		$('#humidityDataTable tbody').prepend(html);
+
+		HumidityChart.data.labels.push(row['time']);
+		HumidityChart.data.datasets[0].data.push(row['humidity']);
+
+		HumidityChart.update();
 	});
 })();

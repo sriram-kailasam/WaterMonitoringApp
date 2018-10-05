@@ -11,5 +11,10 @@
 					<td>${row['temperature']}</td></tr>`;
 
 		$('#temperatureDataTable tbody').prepend(html);
+
+		TemperatureChart.data.labels.push(row['time']);
+		TemperatureChart.data.datasets[0].data.push(row['temperature']);
+
+		TemperatureChart.update();
 	});
 })();

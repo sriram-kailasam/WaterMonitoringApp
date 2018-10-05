@@ -12,5 +12,14 @@
 					<td>${row['humidity']}</td></tr>`;
 
 		$('#temperatureHumidityDataTable tbody').prepend(html);
+
+		TemperatureChart.data.labels.push(row['time']);
+		TemperatureChart.data.datasets[0].data.push(row['temperature']);
+
+		HumidityChart.data.labels.push(row['time']);
+		HumidityChart.data.datasets[0].data.push(row['humidity']);
+
+		TemperatureChart.update();
+		HumidityChart.update();
 	});
 })();

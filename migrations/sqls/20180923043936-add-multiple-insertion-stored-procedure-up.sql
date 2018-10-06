@@ -21,7 +21,7 @@ CREATE OR REPLACE FUNCTION insert_into_temperature_and_humidity_tables(
 
         PERFORM pg_notify('temperature_humidity_change_channel', json_build_object(
             'date', to_char(datetime, 'DD-MM-YYYY'),
-            'time', to_char(datetime, 'HH:MI:SS'),
+            'time', to_char(datetime, 'HH24:MI:SS'),
             'temperature', temperature,
             'humidity', humidity,
             'waterBodyId', water_body_id

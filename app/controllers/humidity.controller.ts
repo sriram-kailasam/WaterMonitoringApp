@@ -1,4 +1,3 @@
-import {Request, Response} from 'express';
 import {DbClient} from '../server';
 import {HumidityInfo} from '../models/humidity_info.model';
 
@@ -6,7 +5,7 @@ export class HumidityController {
 	static async getHumidityData(waterBodyId: number): Promise<Array<HumidityInfo>> {
 		let humidityQuery = 
 		"SELECT to_char(humidity_data.datetime, 'DD-MM-YYYY') AS date, "
-		+ "to_char(humidity_data.datetime, 'HH:MI:SS') AS time, "
+		+ "to_char(humidity_data.datetime, 'HH24:MI:SS') AS time, "
 		+ "humidity_data.humidity " 
 		+ "FROM water_bodies INNER JOIN humidity_data ON "
 		+ "water_bodies.id=humidity_data.water_body_id "

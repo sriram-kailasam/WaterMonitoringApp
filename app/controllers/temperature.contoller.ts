@@ -6,7 +6,7 @@ export class TemperatureController {
 	static async getTemperatureData(waterBodyId: number): Promise<Array<TemperatureInfo>> {
 		const temperatureQuery =
 			`SELECT to_char(temperature_data.datetime, 'DD-MM-YYYY') AS date,
-			to_char(temperature_data.datetime, 'HH:MI:SS') AS time,
+			to_char(temperature_data.datetime, 'HH24:MI:SS') AS time,
 			temperature_data.temperature
 			FROM water_bodies INNER JOIN temperature_data ON
 			water_bodies.id=temperature_data.water_body_id

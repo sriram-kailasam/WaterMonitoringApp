@@ -12,7 +12,8 @@
 
 		$('#humidityDataTable tbody').prepend(html);
 
-		HumidityChart.data.labels.push(row['time']);
+		let timeRegex = new RegExp(/[0-9]{2}:[0-9]{2}/);
+		HumidityChart.data.labels.push(timeRegex.exec(row['time'])[0]);
 		HumidityChart.data.datasets[0].data.push(row['humidity']);
 
 		HumidityChart.update();

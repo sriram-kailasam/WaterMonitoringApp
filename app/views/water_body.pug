@@ -50,7 +50,9 @@ block append scripts
 		let humidityData = !{JSON.stringify(humidityData)}
 
 		temperatureData.reverse().forEach((info) => {
-			labels.push(info.time);
+			let timeRegex = new RegExp(/[0-9]{2}:[0-9]{2}/);
+
+			labels.push(timeRegex.exec(info.time)[0]);
 			temperatureDataset.push(info.temperature);
 		});
 

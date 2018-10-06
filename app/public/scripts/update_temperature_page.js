@@ -12,7 +12,8 @@
 
 		$('#temperatureDataTable tbody').prepend(html);
 
-		TemperatureChart.data.labels.push(row['time']);
+		let timeRegex = new RegExp(/[0-9]{2}:[0-9]{2}/);
+		TemperatureChart.data.labels.push(timeRegex.exec(row['time'])[0]);
 		TemperatureChart.data.datasets[0].data.push(row['temperature']);
 
 		TemperatureChart.update();

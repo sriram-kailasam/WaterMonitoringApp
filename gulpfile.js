@@ -2,9 +2,9 @@ const gulp = require('gulp');
 const terser = require('gulp-terser');
 
 function minifyJs() {
-	return gulp.src('app/public/scripts/*.js').
-		pipe(terser()).
-		pipe(gulp.dest('dist/public/scripts'))
+	return gulp.src('app/public/scripts/*.js')
+		.pipe(terser())
+		.pipe(gulp.dest('dist/public/scripts'));
 }
 
 function views() {

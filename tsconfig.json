@@ -7,7 +7,7 @@
     "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "sourceMap": true
+    "inlineSourceMap": true
   },
 
   "exclude": [
